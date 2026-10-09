@@ -177,7 +177,8 @@ Produtos com estoque baixo: 3
 
 //INICIO DO CÓDIGO
 
-
+// ===== 1. DADOS =====
+// Tarefa 1 — Dados da loja
 
 const nomeLoja = "Oficina de Materiais de Construção do joão";
 const minimoEstoque = 5; // quantidade mínima de estoque para um produto não estar em falta
@@ -232,6 +233,8 @@ let produtos = [
     }
 ];
 
+
+// ===== 2. FUNÇÕES =====
 
 /*
 
@@ -354,6 +357,8 @@ function gerarRelatorio(nome, lista) {
     }
 }
 
+// ===== 3. PROGRAMA PRINCIPAL =====
+
 function main() {
     console.log("--- Tarefa 2: listar ---");
     listarProdutos(produtos);
@@ -390,6 +395,9 @@ function main() {
     if (registrarVenda(produtos, "Parafuso", 10)) {
         const parafuso = buscarProduto(produtos, "Parafuso");
         console.log(`Venda realizada! Parafuso: ${parafuso.quantidade} un. em estoque, ${parafuso.vendidos} vendidos.`);
+    }
+    if (!registrarVenda(produtos, "Martelo", 100)) {
+        console.log("Venda não realizada: estoque insuficiente ou produto inexistente.");
     }
     if (!registrarVenda(produtos, "Produto inexistente", 1)) {
         console.log("Venda não realizada: estoque insuficiente ou produto inexistente.");
