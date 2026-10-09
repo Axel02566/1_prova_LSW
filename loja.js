@@ -352,8 +352,57 @@ function gerarRelatorio(nome, lista) {
 }
 
 function main() {
+    console.log("--- Tarefa 2: listar ---");
     listarProdutos(produtos);
-    console.log(`O valor total do estoque é R$ ${calcularValorEstoque(produtos)}`);
+
+    console.log("--- Tarefa 3: cadastrar ---");
+    const quantidadeProdutos = cadastrarProduto(produtos, "  serra circular  ", "Ferramentas", 50, 4);
+    console.log(`Produto cadastrado! Agora a loja tem ${quantidadeProdutos} produtos.`);
+
+    console.log("--- Tarefa 4: valor do estoque ---");
+    console.log(`Valor do estoque: R$ ${calcularValorEstoque(produtos)}`);
+
+    console.log("--- Tarefa 5: buscar ---");
+    const produtoEncontrado = buscarProduto(produtos, "MARTELO");
+    if (produtoEncontrado !== null) {
+        console.log(`Encontrado: ${produtoEncontrado.nome} - R$ ${produtoEncontrado.preco}`);
+    }
+    if (buscarProduto(produtos, "Produto inexistente") === null) {
+        console.log("Produto não encontrado.");
+    }
+
+    console.log("--- Tarefa 6: em falta ---");
+    const produtosBaixoEstoque = produtosEmFalta(produtos, minimoEstoque);
+    console.log(`Produtos com menos de ${minimoEstoque} unidades: ${produtosBaixoEstoque.length}`);
+
+    console.log("--- Tarefa 7: desconto ---");
+    const quantidadeComDesconto = aplicarDesconto(produtos, "Materiais", 10);
+    console.log(`${quantidadeComDesconto} produtos receberam desconto.`);
+    const tinta = buscarProduto(produtos, "Tinta");
+    if (tinta !== null) {
+        console.log(`Novo preço da tinta: R$ ${tinta.preco}`);
+    }
+
+    console.log("--- Tarefa 8: registrar venda ---");
+    if (registrarVenda(produtos, "Parafuso", 10)) {
+        const parafuso = buscarProduto(produtos, "Parafuso");
+        console.log(`Venda realizada! Parafuso: ${parafuso.quantidade} un. em estoque, ${parafuso.vendidos} vendidos.`);
+    }
+    if (!registrarVenda(produtos, "Produto inexistente", 1)) {
+        console.log("Venda não realizada: estoque insuficiente ou produto inexistente.");
+    }
+
+    console.log("--- Tarefa 9: formatar nome ---");
+    console.log(formatarNome("  bORRACHA BRANCA  "));
+
+    console.log("--- Tarefa 10: JSON ---");
+    const textoJSON = converterParaJSON(produtos);
+    console.log(typeof textoJSON);
+    const produtosRecuperados = lerJSON(textoJSON);
+    console.log(`Itens recuperados: ${produtosRecuperados.length} | Primeiro: ${produtosRecuperados[0].nome}`);
+
+    console.log("--- Tarefa 11: relatório ---");
+    gerarRelatorio(nomeLoja, produtos);
 }
 
 main();
