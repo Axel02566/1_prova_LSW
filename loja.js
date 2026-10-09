@@ -17,7 +17,7 @@ No programa principal, antes de testar cada tarefa, exiba um título no formato:
 Trabalhe tarefa por tarefa: escreva a função, teste, confira a saída e só então passe para a próxima.
 
 
-Tarefas
+Tarefas (0 )
 Cada tarefa traz o nome da função, o que ela deve fazer, os conceitos envolvidos, perguntas para guiar o raciocínio e a saída esperada com os dados da Papelaria ExemplO.
 
 
@@ -175,8 +175,11 @@ Produtos com estoque baixo: 3
 
 */
 
+//INICIO DO CÓDIGO
 
-const nomeLoja = "Oficina do joão";
+
+
+const nomeLoja = "Oficina de Materiais de Construção do joão";
 const minimoEstoque = 5; // quantidade mínima de estoque para um produto não estar em falta
 
 
@@ -393,7 +396,7 @@ function main() {
     }
 
     console.log("--- Tarefa 9: formatar nome ---");
-    console.log(formatarNome("  bORRACHA BRANCA  "));
+    console.log(formatarNome("  cHAVE de fenda  "));
 
     console.log("--- Tarefa 10: JSON ---");
     const textoJSON = converterParaJSON(produtos);
