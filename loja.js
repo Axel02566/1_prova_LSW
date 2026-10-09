@@ -359,7 +359,96 @@ function gerarRelatorio(nome, lista) {
 
 // ===== 3. PROGRAMA PRINCIPAL =====
 
+function perguntar(texto) {
+    const resposta = prompt(texto);
+    return resposta === null ? "" : resposta.trim();
+}
+
+function montarMenu() {
+    return `===== ${nomeLoja} =====
+1. Listar produtos
+2. Cadastrar produto
+3. Valor do estoque
+4. Buscar produto
+5. Produtos em falta
+6. Aplicar desconto
+7. Registrar venda
+8. Salvar e recuperar em JSON
+9. Relatório final
+0. Sair e rodar os testes`;
+}
+
+function executarOpcao(opcao) {
+    if (opcao === "1") {
+        listarProdutos(produtos);
+    } else if (opcao === "2") {
+        const nome = perguntar("Nome: ");
+        const categoria = perguntar("Categoria: ");
+        const preco = Number(perguntar("Preço: "));
+        const quantidade = Number(perguntar("Quantidade: "));
+        if (nome === "" || categoria === "" || isNaN(preco) || isNaN(quantidade)) {
+            console.log("Dados inválidos. Produto não cadastrado.");
+        } else {
+            const total = cadastrarProduto(produtos, nome, categoria, preco, quantidade);
+            console.log(`Produto cadastrado! Agora a loja tem ${total} produtos.`);
+        }
+    } else if (opcao === "3") {
+        console.log(`Valor do estoque: R$ ${calcularValorEstoque(produtos)}`);
+    } else if (opcao === "4") {
+        const encontrado = buscarProduto(produtos, perguntar("Termo de busca: "));
+        if (encontrado !== null) {
+            console.log(`Encontrado: ${encontrado.nome} - R$ ${encontrado.preco}`);
+        } else {
+            console.log("Produto não encontrado.");
+        }
+    } else if (opcao === "5") {
+        const minimo = Number(perguntar("Quantidade mínima: "));
+        if (isNaN(minimo)) {
+            console.log("Valor inválido.");
+        } else {
+            const emFalta = produtosEmFalta(produtos, minimo);
+            console.log(`Produtos com menos de ${minimo} unidades: ${emFalta.length}`);
+        }
+    } else if (opcao === "6") {
+        const categoria = perguntar("Categoria: ");
+        const percentual = Number(perguntar("Percentual de desconto: "));
+        if (isNaN(percentual)) {
+            console.log("Valor inválido.");
+        } else {
+            console.log(`${aplicarDesconto(produtos, categoria, percentual)} produtos receberam desconto.`);
+        }
+    } else if (opcao === "7") {
+        const nome = perguntar("Produto: ");
+        const quantidade = Number(perguntar("Quantidade: "));
+        if (!isNaN(quantidade) && registrarVenda(produtos, nome, quantidade)) {
+            const produto = buscarProduto(produtos, nome);
+            console.log(`Venda realizada! ${produto.nome}: ${produto.quantidade} un. em estoque, ${produto.vendidos} vendidos.`);
+        } else {
+            console.log("Venda não realizada: estoque insuficiente ou produto inexistente.");
+        }
+    } else if (opcao === "8") {
+        const texto = converterParaJSON(produtos);
+        const recuperados = lerJSON(texto);
+        console.log(`Itens recuperados: ${recuperados.length} | Primeiro: ${recuperados[0].nome}`);
+    } else if (opcao === "9") {
+        gerarRelatorio(nomeLoja, produtos);
+    } else if (opcao !== "0") {
+        console.log("Opção inválida.");
+    }
+}
+
 function main() {
+    let opcao;
+    do {
+        const resposta = prompt(montarMenu());
+        opcao = resposta === null ? "0" : resposta.trim();
+        executarOpcao(opcao);
+    } while (opcao !== "0");
+}
+
+// ===== 4. TESTES =====
+
+function executarTestes() {
     console.log("--- Tarefa 2: listar ---");
     listarProdutos(produtos);
 
@@ -404,7 +493,7 @@ function main() {
     }
 
     console.log("--- Tarefa 9: formatar nome ---");
-    console.log(formatarNome("  cHAVE de fenda  "));
+    console.log(formatarNome("  cIMENTO branco  "));
 
     console.log("--- Tarefa 10: JSON ---");
     const textoJSON = converterParaJSON(produtos);
@@ -417,3 +506,21 @@ function main() {
 }
 
 main();
+executarTestes();
+
+// FIM DO CÓDIGO
+
+/*
+comentário pessoal mesmo, o sistema em sí não é dificil, o problema é aguentar o quanto que o Linux tá crashando, socorro, se der tudo certo eu troco do Ubuntu pro Debian, ao menos espero que isso resolva meus problemas por hora, espero...
+
+enfim, saindo desse sofrimento, como vai seu dia? sla, só queria escrever algo meio fora da curva mesmo e aqui vai um gato em ascii pq sim kk
+
+ /\_/\
+( o.o )
+ > ^ <
+
+ arrumei ele desse link aqui: https://www.asciiart.eu/art/93447ab3a0233637
+ Então créditos ao autor
+
+ Aluno: Gustavo Marques
+*/
