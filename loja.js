@@ -241,33 +241,30 @@ Saída esperada (exemplo):
 6. Estojo | acessórios | R$ 18 | 6 un. | 4 vendidos
 
  */
-function exibirProdutos() {
-    console.log("Produtos disponíveis na loja:");
-    for (let i = 0; i < produtos.length; i++) {
-        const produto = produtos[i];
-        console.log(`${i + 1}) ${produto.nome} | ${produto.categoria} |R$${produto.preco.toFixed(2)} | ${produto.quantidade} unidades |${produto.vendidos} vendidos`);
+function listarProdutos(lista) {
+    for (let i = 0; i < lista.length; i++) {
+        const produto = lista[i];
+        console.log(`${i + 1}. ${produto.nome} | ${produto.categoria} | R$ ${produto.preco} | ${produto.quantidade} un. | ${produto.vendidos} vendidos`);
     }
 }
 
-function cadastrarProduto(nome, categoria, preco, quantidade) {
+function cadastrarProduto(lista, nome, categoria, preco, quantidade) {
     const novoProduto = {
-        nome: nome,
+        nome: formatarNome(nome),
         categoria: categoria,
         preco: preco,
         quantidade: quantidade,
         vendidos: 0
     };
-    produtos.push(novoProduto);
-    console.log(`Produto cadastrado! Agora a loja possui ${produtos.length} produtos.`);
+    lista.push(novoProduto);
+    return lista.length;
 }
 
 
-// Saída esperada: "O valor total do estoque é $[valorTotal]"
-// atribuir isso na main e exibir no console.log
-function calcularValorTotalEstoque() {
+function calcularValorEstoque(lista) {
     let valorTotal = 0;
-    for (let i = 0; i < produtos.length; i++) {
-        const produto = produtos[i];
+    for (let i = 0; i < lista.length; i++) {
+        const produto = lista[i];
         valorTotal += produto.preco * produto.quantidade;
     }
     return valorTotal;
@@ -276,34 +273,35 @@ function calcularValorTotalEstoque() {
  Procure o primeiro produto cujo nome contém o termo pesquisado, sem diferenciar maiúsculas de minúsculas (buscar "MOCHILA" deve encontrar "Mochila"). Retorne o produto encontrado ou null se nenhum produto corresponder.
  */
 
-function buscarProduto(nome) {
-    for (let i = 0; i < produtos.length; i++) {
-        const produto = produtos[i];
-        if (produto.nome.toLowerCase().includes(nome.toLowerCase())) {
-            console.log(`Encontrado: ${produto.nome} - R$ ${produto.preco.toFixed(2)}`);
+function buscarProduto(lista, termo) {
+    for (let i = 0; i < lista.length; i++) {
+        const produto = lista[i];
+        if (produto.nome.toLowerCase().includes(termo.toLowerCase())) {
             return produto;
         }
     }
-    console.log(`Produto não encontrado: ${nome}`);
     return null;
 }
 
-function produtoEmFalta(produto, minimo) {
-    if (produto.quantidade < minimo) {
-        console.log(`O produto ${produto.nome} está em falta! Quantidade em estoque: ${produto.quantidade}`);
-        return true;
+function produtosEmFalta(lista, minimo) {
+    const produtosBaixoEstoque = [];
+    for (let i = 0; i < lista.length; i++) {
+        if (lista[i].quantidade < minimo) {
+            produtosBaixoEstoque.push(lista[i]);
+        }
     }
-    return false;
+    return produtosBaixoEstoque;
 }
 
-function aplicarDesconto(produto, categoria ,percentual) {
-    if (produto.categoria === categoria) {
-        const desconto = produto.preco * (percentual / 100);
-        produto.preco -= desconto;
-        console.log(`Desconto aplicado! Novo preço do produto ${produto.nome}: R$ ${produto.preco.toFixed(2)}`);
-    } else {
-        console.log(`O produto ${produto.nome} não pertence à categoria ${categoria}. Nenhum desconto aplicado.`);
+function aplicarDesconto(lista, categoria, percentual) {
+    let produtosAlterados = 0;
+    for (let i = 0; i < lista.length; i++) {
+        if (lista[i].categoria === categoria) {
+            lista[i].preco -= lista[i].preco * percentual / 100;
+            produtosAlterados++;
+        }
     }
+    return produtosAlterados;
 }
 
 /*
@@ -314,31 +312,48 @@ Venda não realizada: estoque insuficiente ou produto inexistente.
 
 */
 
-function registrarVenda(produto, nome, quantidade) {
-    if (produto.nome === nome) {
-        if (produto.quantidade >= quantidade) {
-            produto.quantidade -= quantidade;
-            produto.vendidos += quantidade;
-            console.log(`Venda registrada! Produto: ${produto.nome}, Quantidade: ${quantidade}, Novo estoque: ${produto.quantidade}`);
-        } else {
-            console.log(`Estoque insuficiente para a venda do produto ${produto.nome}.`);
-        }
-    } else {
-        console.log(`O produto ${produto.nome} não corresponde ao nome informado.`);
+function registrarVenda(lista, nome, quantidade) {
+    const produto = buscarProduto(lista, nome);
+    if (produto === null || produto.quantidade < quantidade) {
+        return false;
     }
+
+    produto.quantidade -= quantidade;
+    produto.vendidos += quantidade;
+    return true;
 }
 
-function formatarNomeProduto(texto) {
-    const palavras = texto.split(" ");
-    for (let i = 0; i < palavras.length; i++) {
-        palavras[i] = palavras[i].charAt(0).toUpperCase() + palavras[i].slice(1).toLowerCase();
+function formatarNome(texto) {
+    const nomeSemEspacos = texto.trim().toLowerCase();
+    if (nomeSemEspacos.length === 0) {
+        return "";
     }
-    return palavras.join(" ");
+    return nomeSemEspacos.charAt(0).toUpperCase() + nomeSemEspacos.slice(1);
+}
+
+function converterParaJSON(lista) {
+    return JSON.stringify(lista);
+}
+
+function lerJSON(texto) {
+    return JSON.parse(texto);
+}
+
+function gerarRelatorio(nome, lista) {
+    const produtosBaixoEstoque = produtosEmFalta(lista, minimoEstoque);
+    console.log(`===== RELATÓRIO: ${nome.toUpperCase()} =====`);
+    console.log(`Produtos cadastrados: ${lista.length}`);
+    console.log(`Valor total em estoque: R$ ${calcularValorEstoque(lista)}`);
+    console.log(`Produtos com estoque baixo: ${produtosBaixoEstoque.length}`);
+    for (let i = 0; i < produtosBaixoEstoque.length; i++) {
+        const produto = produtosBaixoEstoque[i];
+        console.log(`- ${produto.nome} (${produto.quantidade} un.)`);
+    }
 }
 
 function main() {
-    exibirProdutos();
-    console.log(`O valor total do estoque é $${calcularValorTotalEstoque().toFixed(2)}`);
-    produtoEmFalta(produtos[0], minimoEstoque);
-    return;
+    listarProdutos(produtos);
+    console.log(`O valor total do estoque é R$ ${calcularValorEstoque(produtos)}`);
 }
+
+main();
